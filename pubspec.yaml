@@ -1,6 +1,6 @@
 name: gestures
 description: Custom Gesture Detector for Flutter. Empower your users with custom gestures.
-version: 0.0.1
+version: 1.0.0
 homepage: https://github.com/AndreBaltazar8/flutter_gestures
 
 environment:
