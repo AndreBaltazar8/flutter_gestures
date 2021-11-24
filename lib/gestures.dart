@@ -128,12 +128,18 @@ class CustomGestureDetector extends StatefulWidget {
   /// by the parameter [success].
   final Function(bool success) onGestureEnd;
 
+  /// How this gesture detector should behave during hit testing.
+  ///
+  /// See [GestureDetector.behavior] for defaults.
+  final HitTestBehavior? behavior;
+
   CustomGestureDetector({
     Key? key,
     required Widget child,
     required this.gestures,
     this.onGestureStart,
     required this.onGestureEnd,
+    this.behavior,
   })  : this.child = child,
         assert(gestures.length > 0),
         super(key: key);
@@ -149,6 +155,7 @@ class _CustomGestureDetectorState extends State<CustomGestureDetector> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: widget.behavior,
       onPanStart: (_) {
         _trackingGesture = true;
         _currentGesture = 0;
