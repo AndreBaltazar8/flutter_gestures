@@ -2,36 +2,56 @@ library gestures;
 
 import 'package:flutter/material.dart';
 
+/// A gesture to be used in [CustomGestureDetector].
+///
+/// This class needs to be extended to implement the necessary gesture.
 abstract class Gesture {
+  /// Whether this gesture has been triggered.
   bool get triggered;
+
+  /// Whether this gesture has been complete.
   bool get complete;
+
+  /// Whether this gesture failed.
   bool get failed;
+
+  /// Updates the gesture when gesture detection is happening.
   void update(Offset delta);
+
+  /// Resets the gesture for reuse.
   void reset();
 }
 
+/// A line gesture to used in [CustomGestureDetector].
+///
+/// Detects gestures on based on lines on the screen.
 class GestureLine extends Gesture {
+  /// Direction of the gesture line.
   final AxisDirection direction;
-  final double distance;
-  final double triggerDistance;
-  final double failDistance;
-  Axis _counterAxis;
 
+  /// Distance required to complete the gesture.
+  final double distance;
+
+  /// Distance required to trigger the start of the gesture line.
+  final double triggerDistance;
+
+  /// Distance from the line what will make the gesture recognition fail.
+  final double failDistance;
+  late Axis _counterAxis;
+
+  /// Constructs a [GestureLine] with the provided arguments.
   GestureLine(
-      this.direction, {
-        this.triggerDistance = 25.0,
-        this.distance = 100.0,
-        this.failDistance = 40.0,
-      }) {
-    assert(direction != null);
-    assert(distance != null);
-    assert(failDistance != null);
+    this.direction, {
+    this.triggerDistance = 25.0,
+    this.distance = 100.0,
+    this.failDistance = 40.0,
+  }) {
     _counterAxis = flipAxis(axisDirectionToAxis(direction));
     reset();
   }
 
-  double _gestureX;
-  double _gestureY;
+  late double _gestureX;
+  late double _gestureY;
 
   bool _triggered = false;
   @override
@@ -91,23 +111,31 @@ class GestureLine extends Gesture {
   }
 }
 
+/// Recognizes custom gestures.
+///
+/// Custom gestures can be created by extending from [Gesture] class.
 class CustomGestureDetector extends StatefulWidget {
+  /// Child wrapped by the gesture detector.
   final Widget child;
+
+  /// List of gestures that need to be triggered to complete the gesture.
   final List<Gesture> gestures;
-  final Function onGestureStart;
+
+  /// Callback when a gesture starts being detected.
+  final Function? onGestureStart;
+
+  /// Callback when a gesture ends. Whether it failed or succeeded is determined
+  /// by the parameter [success].
   final Function(bool success) onGestureEnd;
 
   CustomGestureDetector({
-    Key key,
-    @required Widget child,
-    @required this.gestures,
+    Key? key,
+    required Widget child,
+    required this.gestures,
     this.onGestureStart,
-    @required this.onGestureEnd,
-  })  : assert(child != null),
-        this.child = child,
-        assert(gestures != null),
+    required this.onGestureEnd,
+  })  : this.child = child,
         assert(gestures.length > 0),
-        assert(onGestureEnd != null),
         super(key: key);
 
   @override
@@ -125,7 +153,7 @@ class _CustomGestureDetectorState extends State<CustomGestureDetector> {
         _trackingGesture = true;
         _currentGesture = 0;
         widget.gestures.forEach((g) => g.reset());
-        if (widget.onGestureStart != null) widget.onGestureStart();
+        widget.onGestureStart?.call();
       },
       onPanUpdate: (details) {
         if (_trackingGesture) {
